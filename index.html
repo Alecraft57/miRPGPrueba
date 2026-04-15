@@ -3,35 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG Interactivo</title>
+    <title>Supervivencia RPG</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div id="game-container">
-        <h2 id="player-name">Cargando...</h2>
+        <header>
+            <h2 id="player-name">Cargando...</h2>
+        </header>
 
-        <div class="stat-card">
-            <span>❤️ Vida</span>
-            <div class="bar-container"><div id="hp-bar" class="bar"></div></div>
-            <span id="hp-text">0/100</span>
-        </div>
-
-        <div class="stat-card">
-            <span>⚡ Energía</span>
-            <div class="bar-container"><div id="en-bar" class="bar"></div></div>
-            <span id="en-text">0/100</span>
-        </div>
-
-        <div class="gold-display">💰 Oro: <span id="oro-val">0</span></div>
-
-        <div class="actions">
-            <button id="btn-explorar-visual" class="btn-main">🌲 Explorar Bosque</button>
-            <div class="row">
-                <button id="btn-tienda-visual" class="btn-shop">🏪 Tienda</button>
-                <button id="btn-mochila-visual" class="btn-bag">🎒 Mochila</button>
+        <section class="stats">
+            <div class="stat-card">
+                <div class="label">❤️ Vida</div>
+                <div class="bar-container"><div id="hp-bar" class="bar"></div></div>
+                <span id="hp-text">0/100</span>
             </div>
-        </div>
+
+            <div class="stat-card">
+                <div class="label">⚡ Energía</div>
+                <div class="bar-container"><div id="en-bar" class="bar"></div></div>
+                <span id="en-text">0/100</span>
+            </div>
+
+            <div class="stat-card gold">
+                💰 Oro: <span id="oro-val">0</span>
+            </div>
+        </section>
+
+        <section class="game-actions">
+            <button id="btn-explorar-visual" class="primary">🌲 Explorar Bosque (10⚡)</button>
+            <div class="secondary-actions">
+                <button id="btn-tienda-visual" class="shop-btn">🏪 Tienda</button>
+                <button id="btn-mochila-visual" class="bag-btn">🎒 Mochila</button>
+            </div>
+        </section>
+
+        <nav class="actions">
+            <button id="btn-cerrar" class="secondary">Volver al Chat</button>
+        </nav>
     </div>
     <script src="app.js"></script>
 </body>

@@ -2,9 +2,9 @@ const tg = window.Telegram.WebApp;
 tg.expand();
 
 const urlParams = new URLSearchParams(window.location.search);
-const SERVER_URL = "https://TU_URL_DE_NGROK.ngrok-free.app"; // <-- ASEGÚRATE DE QUE SEA LA DE NGROK ACTUAL
+// CAMBIA ESTA URL POR LA DE NGROK CADA VEZ QUE LO ABRAS
+const SERVER_URL = "https://tu-url-de-ngrok.ngrok-free.app"; 
 
-// Elementos visuales
 const hpBar = document.getElementById('hp-bar');
 const enBar = document.getElementById('en-bar');
 const hpText = document.getElementById('hp-text');
@@ -12,38 +12,28 @@ const enText = document.getElementById('en-text');
 const oroVal = document.getElementById('oro-val');
 const playerName = document.getElementById('player-name');
 
-// Botones
 const btnExplorar = document.getElementById('btn-explorar-visual');
 const btnTienda = document.getElementById('btn-tienda-visual');
 const btnMochila = document.getElementById('btn-mochila-visual');
 
 function updateUI(data) {
-    playerName.innerText = data.nombre || playerName.innerText;
-    hpBar.style.width = `${data.hp}%`;
-    hpText.innerText = `${data.hp}/100`;
-    enBar.style.width = `${data.en}%`;
-    enText.innerText = `${data.en}/100`;
-    oroVal.innerText = data.oro;
+    if(data.hp !== undefined) {
+        hpBar.style.width = `${data.hp}%`;
+        hpText.innerText = `${data.hp}/100`;
+    }
+    if(data.en !== undefined) {
+        enBar.style.width = `${data.en}%`;
+        enText.innerText = `${data.en}/100`;
+    }
+    if(data.oro !== undefined) {
+        oroVal.innerText = data.oro;
+    }
 }
 
-// Lógica para Explorar
-btnExplorar.onclick = async () => {
+// Función genérica para enviar acciones al servidor
+async function enviarAccion(ruta) {
     try {
-        const response = await fetch(`${SERVER_URL}/explorar`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ user_id: urlParams.get('user_id') })
-        });
-        const data = await response.json();
-        if (data.success) updateUI(data);
-        else alert(data.msg);
-    } catch (e) { console.error(e); }
-};
-
-// Lógica para Tienda (Comprar)
-btnTienda.onclick = async () => {
-    try {
-        const response = await fetch(`${SERVER_URL}/comprar`, {
+        const response = await fetch(`${SERVER_URL}/${ruta}`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ user_id: urlParams.get('user_id') })
@@ -51,34 +41,22 @@ btnTienda.onclick = async () => {
         const data = await response.json();
         if (data.success) {
             updateUI(data);
-            alert("✅ ¡Compraste una ración!");
         } else {
-            alert("❌ " + data.msg);
+            alert(data.msg);
         }
-    } catch (e) { alert("Error de conexión"); }
-};
+    } catch (error) {
+        console.error("Error de conexión:", error);
+    }
+}
 
-// Lógica para Mochila (Usar)
-btnMochila.onclick = async () => {
-    try {
-        const response = await fetch(`${SERVER_URL}/usar`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ user_id: urlParams.get('user_id') })
-        });
-        const data = await response.json();
-        if (data.success) {
-            updateUI(data);
-            alert("🍴 ¡Has recuperado energía!");
-        } else {
-            alert("🎒 " + data.msg);
-        }
-    } catch (e) { alert("Error de conexión"); }
-};
+btnExplorar.onclick = () => enviarAccion('explorar');
+btnTienda.onclick = () => enviarAccion('comprar');
+btnMochila.onclick = () => enviarAccion('usar');
 
-// Carga inicial de datos
+// Carga inicial desde la URL (para evitar los "null")
 updateUI({
-    hp: urlParams.get('hp'),
-    en: urlParams.get('en'),
-    oro: urlParams.get('oro')
+    hp: parseInt(urlParams.get('hp')) || 100,
+    en: parseInt(urlParams.get('en')) || 50,
+    oro: parseInt(urlParams.get('oro')) || 0
 });
+playerName.innerText = tg.initDataUnsafe.user?.first_name || "Explorador";

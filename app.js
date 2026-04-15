@@ -1,8 +1,10 @@
-// 1. Inicializar la WebApp de Telegram
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// 2. Referencias a los elementos de la interfaz (HTML)
+const urlParams = new URLSearchParams(window.location.search);
+const SERVER_URL = "https://TU_URL_DE_NGROK.ngrok-free.app"; // <-- ASEGÚRATE DE QUE SEA LA DE NGROK ACTUAL
+
+// Elementos visuales
 const hpBar = document.getElementById('hp-bar');
 const enBar = document.getElementById('en-bar');
 const hpText = document.getElementById('hp-text');
@@ -10,114 +12,73 @@ const enText = document.getElementById('en-text');
 const oroVal = document.getElementById('oro-val');
 const playerName = document.getElementById('player-name');
 
+// Botones
 const btnExplorar = document.getElementById('btn-explorar-visual');
 const btnTienda = document.getElementById('btn-tienda-visual');
 const btnMochila = document.getElementById('btn-mochila-visual');
-const btnCerrar = document.getElementById('btn-cerrar');
 
-// 3. Configuración del Servidor
-// RECUERDA: Si usas Ngrok, pon aquí la URL que te dé Ngrok (ej: https://...ngrok-free.app)
-// Si solo pruebas en el navegador de tu PC con el bot abierto ahí, usa 'http://localhost:5000'
-const SERVER_URL = " https://automaker-amuck-gleeful.ngrok-free.dev"; 
-
-// 4. Función para actualizar la UI con nuevos datos
 function updateUI(data) {
-    if (data.nombre) playerName.innerText = data.nombre;
-    
-    // Actualizar barras y textos
+    playerName.innerText = data.nombre || playerName.innerText;
     hpBar.style.width = `${data.hp}%`;
     hpText.innerText = `${data.hp}/100`;
-    
     enBar.style.width = `${data.en}%`;
     enText.innerText = `${data.en}/100`;
-    
     oroVal.innerText = data.oro;
 }
 
-// 5. Lógica del botón Explorar (Petición al servidor)
+// Lógica para Explorar
 btnExplorar.onclick = async () => {
-    // Obtenemos el user_id de la URL que envió el bot
-    const urlParams = new URLSearchParams(window.location.search);
-    const userId = urlParams.get('user_id');
-
-    if (!userId) {
-        alert("Error: No se encontró el ID de usuario.");
-        return;
-    }
-
     try {
-        // Enviamos la petición POST al servidor Flask
         const response = await fetch(`${SERVER_URL}/explorar`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ user_id: userId })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ user_id: urlParams.get('user_id') })
         });
-
-        const result = await response.json();
-
-        if (result.success) {
-            // Si el servidor dice que todo OK, actualizamos la pantalla con los nuevos datos
-            updateUI({
-                hp: result.hp,
-                en: result.en,
-                oro: result.oro
-            });
-            console.log(result.msg);
-        } else {
-            // Si no hay energía, por ejemplo
-            tg.showAlert(result.msg);
-        }
-    } catch (error) {
-        console.error("Error conectando al servidor:", error);
-        tg.showAlert("No se pudo conectar con el servidor del juego.");
-    }
+        const data = await response.json();
+        if (data.success) updateUI(data);
+        else alert(data.msg);
+    } catch (e) { console.error(e); }
 };
 
-// 6. Botones que aún envían datos al chat (Tienda y Mochila)
-// Nota: Estos siguen cerrando la app porque llaman a menús de botones de Telegram
-// Botón Tienda
+// Lógica para Tienda (Comprar)
 btnTienda.onclick = async () => {
-    const response = await fetch(`${SERVER_URL}/comprar`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ user_id: urlParams.get('user_id') })
-    });
-    const data = await response.json();
-    if (data.success) {
-        updateUI(data);
-        alert(data.msg);
-    } else {
-        alert(data.msg);
-    }
+    try {
+        const response = await fetch(`${SERVER_URL}/comprar`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ user_id: urlParams.get('user_id') })
+        });
+        const data = await response.json();
+        if (data.success) {
+            updateUI(data);
+            alert("✅ ¡Compraste una ración!");
+        } else {
+            alert("❌ " + data.msg);
+        }
+    } catch (e) { alert("Error de conexión"); }
 };
 
-// Botón Mochila (Usar objeto)
+// Lógica para Mochila (Usar)
 btnMochila.onclick = async () => {
-    const response = await fetch(`${SERVER_URL}/usar`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ user_id: urlParams.get('user_id') })
-    });
-    const data = await response.json();
-    if (data.success) {
-        updateUI(data);
-        alert(data.msg);
-    } else {
-        alert(data.msg);
-    }
+    try {
+        const response = await fetch(`${SERVER_URL}/usar`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ user_id: urlParams.get('user_id') })
+        });
+        const data = await response.json();
+        if (data.success) {
+            updateUI(data);
+            alert("🍴 ¡Has recuperado energía!");
+        } else {
+            alert("🎒 " + data.msg);
+        }
+    } catch (e) { alert("Error de conexión"); }
 };
 
-btnCerrar.onclick = () => {
-    tg.close();
-};
-
-// 7. Carga inicial de datos desde la URL
-const urlParams = new URLSearchParams(window.location.search);
+// Carga inicial de datos
 updateUI({
-    nombre: tg.initDataUnsafe.user?.first_name || "Explorador",
-    hp: parseInt(urlParams.get('hp')) || 100,
-    en: parseInt(urlParams.get('en')) || 0,
-    oro: parseInt(urlParams.get('oro')) || 0
+    hp: urlParams.get('hp'),
+    en: urlParams.get('en'),
+    oro: urlParams.get('oro')
 });

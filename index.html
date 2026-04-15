@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>RPG MiniApp</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -11,24 +10,42 @@
     <div id="game-container">
         <h2 id="player-name">Cargando...</h2>
         <div class="stat-card">
-            <div class="label">❤️ Vida</div>
+            <span>❤️ Vida</span>
             <div class="bar-container"><div id="hp-bar" class="bar hp"></div></div>
-            <div id="hp-text" class="text-val">0/100</div>
+            <span id="hp-text">0/100</span>
         </div>
         <div class="stat-card">
-            <div class="label">⚡ Energía</div>
+            <span>⚡ Energía</span>
             <div class="bar-container"><div id="en-bar" class="bar en"></div></div>
-            <div id="en-text" class="text-val">0/100</div>
+            <span id="en-text">0/100</span>
         </div>
         <div class="gold-card">💰 Oro: <span id="oro-val">0</span></div>
-        <div class="actions">
-            <button id="btn-explorar" class="btn primary">🌲 Explorar Bosque</button>
-            <div class="btn-group">
-                <button id="btn-tienda" class="btn shop">🏪 Tienda</button>
-                <button id="btn-mochila" class="btn bag">🎒 Mochila</button>
-            </div>
+
+        <button id="btn-explorar" class="btn primary">🌲 Explorar Bosque</button>
+        <div class="btn-group">
+            <button onclick="toggleModal('modal-tienda', true)" class="btn shop">🏪 Tienda</button>
+            <button onclick="abrirMochila()" class="btn bag">🎒 Mochila</button>
         </div>
     </div>
+
+    <div id="modal-tienda" class="modal">
+        <div class="modal-content">
+            <h3>🏪 Tienda del Reino</h3>
+            <div class="item">🍎 Comida (20💰) <button onclick="comprar('comida')">Comprar</button></div>
+            <div class="item">🧪 Poción (50💰) <button onclick="comprar('pocion')">Comprar</button></div>
+            <div class="item">💎 Elixir (100💰) <button onclick="comprar('elixir')">Comprar</button></div>
+            <button class="close" onclick="toggleModal('modal-tienda', false)">Cerrar</button>
+        </div>
+    </div>
+
+    <div id="modal-mochila" class="modal">
+        <div class="modal-content">
+            <h3>🎒 Tu Mochila</h3>
+            <div id="lista-inv"></div>
+            <button class="close" onclick="toggleModal('modal-mochila', false)">Cerrar</button>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>

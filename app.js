@@ -77,12 +77,36 @@ btnExplorar.onclick = async () => {
 
 // 6. Botones que aún envían datos al chat (Tienda y Mochila)
 // Nota: Estos siguen cerrando la app porque llaman a menús de botones de Telegram
-btnTienda.onclick = () => {
-    tg.sendData("action_tienda");
+// Botón Tienda
+btnTienda.onclick = async () => {
+    const response = await fetch(`${SERVER_URL}/comprar`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ user_id: urlParams.get('user_id') })
+    });
+    const data = await response.json();
+    if (data.success) {
+        updateUI(data);
+        alert(data.msg);
+    } else {
+        alert(data.msg);
+    }
 };
 
-btnMochila.onclick = () => {
-    tg.sendData("action_mochila");
+// Botón Mochila (Usar objeto)
+btnMochila.onclick = async () => {
+    const response = await fetch(`${SERVER_URL}/usar`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ user_id: urlParams.get('user_id') })
+    });
+    const data = await response.json();
+    if (data.success) {
+        updateUI(data);
+        alert(data.msg);
+    } else {
+        alert(data.msg);
+    }
 };
 
 btnCerrar.onclick = () => {

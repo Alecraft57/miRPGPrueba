@@ -3,7 +3,7 @@ tg.expand();
 
 const urlParams = new URLSearchParams(window.location.search);
 // CAMBIA ESTA URL POR LA DE NGROK CADA VEZ QUE LO ABRAS
-const SERVER_URL = " https://automaker-amuck-gleeful.ngrok-free.dev"; 
+const SERVER_URL = "https://automaker-amuck-gleeful.ngrok-free.dev"; 
 
 const hpBar = document.getElementById('hp-bar');
 const enBar = document.getElementById('en-bar');

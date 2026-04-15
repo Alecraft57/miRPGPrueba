@@ -1,6 +1,6 @@
 const tg = window.Telegram.WebApp;
 const params = new URLSearchParams(window.location.search);
-const SERVER_URL = "https://TU-URL-DE-NGROK.ngrok-free.app"; // ACTUALIZA ESTO
+const SERVER_URL = "https://automaker-amuck-gleeful.ngrok-free.dev"; // ACTUALIZA ESTO
 
 function updateUI(data) {
     if(data.hp !== undefined) {

@@ -1,7 +1,7 @@
 body {
     background-color: #0f0f0f;
     color: #e0e0e0;
-    font-family: 'Courier New', Courier, monospace; /* Toque retro */
+    font-family: 'Courier New', Courier, monospace;
     margin: 0;
     display: flex;
     justify-content: center;
@@ -47,6 +47,8 @@ h2 {
     text-align: center;
 }
 
+.game-actions { margin: 20px 0; }
+
 button {
     width: 100%;
     padding: 15px;
@@ -54,11 +56,22 @@ button {
     border-radius: 5px;
     font-weight: bold;
     cursor: pointer;
-    background: #4CAF50;
-    color: white;
+    font-size: 16px;
 }
 
-button.secondary {
+.primary {
+    background: #4CAF50;
+    color: white;
+    box-shadow: 0 4px #2e7d32;
+}
+
+.primary:active {
+    box-shadow: 0 2px #2e7d32;
+    transform: translateY(2px);
+}
+
+.secondary {
     background: #444;
+    color: white;
     margin-top: 10px;
 }

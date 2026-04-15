@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supervivencia RPG</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div id="game-container">
+        <header>
+            <h2 id="player-name">Cargando...</h2>
+        </header>
+
+        <section class="stats">
+            <div class="stat-card">
+                <div class="label">❤️ Vida</div>
+                <div class="bar-container"><div id="hp-bar" class="bar"></div></div>
+                <span id="hp-text">0/100</span>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">⚡ Energía</div>
+                <div class="bar-container"><div id="en-bar" class="bar"></div></div>
+                <span id="en-text">0/100</span>
+            </div>
+
+            <div class="stat-card gold">
+                💰 Oro: <span id="oro-val">0</span>
+            </div>
+        </section>
+
+        <nav class="actions">
+            <button id="btn-cerrar" class="secondary">Volver al Chat</button>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

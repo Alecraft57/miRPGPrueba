@@ -1,7 +1,9 @@
 const tg = window.Telegram.WebApp;
 const params = new URLSearchParams(window.location.search);
-// Mantengo tu URL de ngrok
-const SERVER_URL = "https://automaker-amuck-gleeful.ngrok-free.dev"; 
+const SERVER_URL = "https://TU-URL-DE-NGROK.ngrok-free.dev"; 
+
+let enemigoActual = null;
+let danoAcumulado = 0;
 
 function updateUI(data) {
     if(data.hp !== undefined) {
@@ -12,79 +14,32 @@ function updateUI(data) {
         document.getElementById('en-bar').style.width = data.en + "%";
         document.getElementById('en-text').innerText = data.en + "/100";
     }
-    if(data.oro !== undefined) {
-        document.getElementById('oro-val').innerText = data.oro;
-    }
-
-    // --- ACTUALIZACIÓN DE XP Y NIVEL ---
-    if(data.lvl !== undefined) {
-        document.getElementById('lvl-val').innerText = data.lvl;
-    }
+    if(data.oro !== undefined) document.getElementById('oro-val').innerText = data.oro;
+    if(data.lvl !== undefined) document.getElementById('lvl-val').innerText = data.lvl;
     if(data.xp !== undefined) {
         document.getElementById('xp-bar').style.width = data.xp + "%";
         document.getElementById('xp-text').innerText = data.xp + "/100 XP";
     }
+    if(data.arma_equipada !== undefined) document.getElementById('arma-val').innerText = data.arma_equipada;
     
-    // --- ACTUALIZACIÓN DE ARMA EQUIPADA ---
-    if(data.arma_equipada !== undefined) {
-        document.getElementById('arma-val').innerText = data.arma_equipada;
-    }
-    
-    document.getElementById('player-name').innerText = tg.initDataUnsafe.user?.first_name || "Explorador";
+    document.getElementById('player-name').innerText = tg.initDataUnsafe.user?.first_name || "Alejandro";
 }
 
-// Carga inicial con datos de la URL
+// Carga Inicial
 updateUI({ 
-    hp: params.get('hp'), 
-    en: params.get('en'), 
-    oro: params.get('oro'),
-    lvl: params.get('lvl') || 1,
-    xp: params.get('xp') || 0,
-    arma_equipada: params.get('arma') || 'Puños'
+    hp: params.get('hp'), en: params.get('en'), oro: params.get('oro'),
+    lvl: params.get('lvl') || 1, xp: params.get('xp') || 0, arma_equipada: params.get('arma') || 'Puños'
 });
 
-// --- GESTIÓN DE MODALES ---
 function cerrarModales() {
-    document.getElementById('modal-tienda').style.display = 'none';
-    document.getElementById('modal-mochila').style.display = 'none';
-    const modalEquipo = document.getElementById('modal-equipo');
-    if(modalEquipo) modalEquipo.style.display = 'none';
+    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
 }
 
-// Botón Tienda
-document.getElementById('btn-tienda-toggle').onclick = () => {
-    const modal = document.getElementById('modal-tienda');
-    const isVisible = modal.style.display === 'block';
-    cerrarModales();
-    if (!isVisible) modal.style.display = 'block';
-};
+// --- BOTONES DE MENÚ ---
+document.getElementById('btn-tienda-toggle').onclick = () => { cerrarModales(); document.getElementById('modal-tienda').style.display = 'block'; };
+document.getElementById('btn-mochila-toggle').onclick = () => { cerrarModales(); document.getElementById('modal-mochila').style.display = 'block'; cargarInventario('mochila'); };
+document.getElementById('btn-equipo-toggle').onclick = () => { cerrarModales(); document.getElementById('modal-equipo').style.display = 'block'; cargarInventario('equipo'); };
 
-// Botón Mochila
-document.getElementById('btn-mochila-toggle').onclick = async () => {
-    const modal = document.getElementById('modal-mochila');
-    const isVisible = modal.style.display === 'block';
-    cerrarModales();
-    if (!isVisible) {
-        modal.style.display = 'block';
-        await cargarInventario('mochila');
-    }
-};
-
-// Botón Equipo (Nuevo)
-const btnEquipo = document.getElementById('btn-equipo-toggle');
-if(btnEquipo) {
-    btnEquipo.onclick = async () => {
-        const modal = document.getElementById('modal-equipo');
-        const isVisible = modal.style.display === 'block';
-        cerrarModales();
-        if (!isVisible) {
-            modal.style.display = 'block';
-            await cargarInventario('equipo');
-        }
-    };
-}
-
-// --- ACCIONES DEL SERVIDOR ---
 async function call(route, body = {}) {
     try {
         const res = await fetch(`${SERVER_URL}/${route}`, {
@@ -95,77 +50,68 @@ async function call(route, body = {}) {
         const d = await res.json();
         if (d.success) updateUI(d);
         return d;
-    } catch (e) { 
-        console.error("Error:", e); 
-    }
+    } catch (e) { tg.showAlert("Error de conexión con el servidor"); }
 }
 
-// Explorar ahora muestra el mensaje de combate/recompensa
+// --- EXPLORACIÓN Y COMBATE ---
 document.getElementById('btn-explorar').onclick = async () => {
-    const data = await call('explorar');
-    if(data && data.msg) {
-        tg.showAlert(data.msg); // Usamos la alerta nativa de Telegram
+    const d = await call('explorar');
+    if (!d.success) return tg.showAlert(d.msg);
+    
+    if (d.tipo === "combate") {
+        iniciarCombate(d.enemigo);
+    } else if (d.msg) {
+        tg.showAlert(d.msg);
     }
 };
 
-async function comprar(item_id) {
-    const res = await call('comprar', { item_id });
-    if (res?.success) {
-        tg.showAlert(res.msg);
+function iniciarCombate(enemigo) {
+    enemigoActual = { ...enemigo, hpMax: enemigo.hp };
+    danoAcumulado = 0;
+    document.getElementById('enemigo-nombre').innerText = enemigo.nombre;
+    document.getElementById('enemigo-hp-bar').style.width = "100%";
+    document.getElementById('combate-log').innerText = "¡Un " + enemigo.nombre + " te ataca!";
+    document.getElementById('modal-combate').style.display = 'block';
+}
+
+document.getElementById('btn-atacar').onclick = async () => {
+    const arma = document.getElementById('arma-val').innerText;
+    const miDano = arma.includes("Lanza") ? 25 : arma.includes("Espada") ? 15 : 7;
+    
+    enemigoActual.hp -= miDano;
+    document.getElementById('enemigo-hp-bar').style.width = Math.max(0, (enemigoActual.hp / enemigoActual.hpMax)*100) + "%";
+    
+    if (enemigoActual.hp <= 0) {
+        document.getElementById('combate-log').innerText = "¡Victoria!";
+        const res = await call('finalizar_combate', { ganado: true, recompensa: {xp: enemigoActual.xp, oro: enemigoActual.oro}, dano_recibido: danoAcumulado });
+        setTimeout(() => cerrarModales(), 1000);
     } else {
-        const oroContainer = document.querySelector('.gold-card');
-        oroContainer.classList.add('insufficient-gold');
-        setTimeout(() => oroContainer.classList.remove('insufficient-gold'), 500);
+        const danoRival = Math.floor(Math.random() * enemigoActual.atq) + 1;
+        danoAcumulado += danoRival;
+        document.getElementById('combate-log').innerText = `Golpeas por ${miDano}. ¡El enemigo te quita ${danoRival} HP!`;
     }
+};
+
+document.getElementById('btn-huir').onclick = () => { cerrarModales(); tg.showAlert("Escapaste..."); };
+
+// --- TIENDA E INVENTARIO ---
+async function comprar(item_id) {
+    const d = await call('comprar', { item_id });
+    tg.showAlert(d.msg);
 }
 
 async function cargarInventario(tipo) {
     const d = await call('get_inventario');
-    // Si tipo es 'mochila' usamos lista-inv, si es 'equipo' usamos lista-equipo
-    const listaId = tipo === 'mochila' ? 'lista-inv' : 'lista-equipo';
-    const lista = document.getElementById(listaId);
-    if(!lista) return;
-
+    const lista = document.getElementById(tipo === 'mochila' ? 'lista-inv' : 'lista-equipo');
     lista.innerHTML = "";
-    
-    if(!d.items || d.items.length === 0) {
-        lista.innerHTML = "<p>Vacío</p>";
-        return;
-    }
-
     d.items.forEach(i => {
-        // Detectamos si es arma por el nombre (puedes mejorar esto en el futuro)
         const esArma = i.nombre.includes("Espada") || i.nombre.includes("Lanza");
-
-        if(tipo === 'mochila' && !esArma) {
-            lista.innerHTML += `
-                <div class="item">
-                    <span>${i.nombre} (x${i.cantidad})</span>
-                    <button onclick="usar('${i.nombre}')">Usar</button>
-                </div>`;
-        } else if(tipo === 'equipo' && esArma) {
-            lista.innerHTML += `
-                <div class="item">
-                    <span>${i.nombre}</span>
-                    <button onclick="equipar('${i.nombre}')">Equipar</button>
-                </div>`;
+        if ((tipo === 'mochila' && !esArma) || (tipo === 'equipo' && esArma)) {
+            lista.innerHTML += `<div class="item"><span>${i.nombre}</span> 
+                <button onclick="${esArma ? 'equipar' : 'usar'}('${i.nombre}')">${esArma ? 'Equipar' : 'Usar'}</button></div>`;
         }
     });
 }
 
-async function usar(nombre_item) {
-    const res = await call('usar', { nombre_item });
-    if (res?.success) {
-        cerrarModales();
-        tg.showScanQrPopup({text: "¡Consumido!"}); // Pequeño feedback
-        setTimeout(() => tg.closeScanQrPopup(), 1000);
-    }
-}
-
-async function equipar(nombre_arma) {
-    const res = await call('equipar_arma', { nombre_arma: nombre_arma });
-    if (res?.success) {
-        cerrarModales();
-        tg.showAlert("Has equipado: " + nombre_arma);
-    }
-}
+async function usar(nombre) { await call('usar', { nombre_item: nombre }); cerrarModales(); tg.showAlert("¡Usado!"); }
+async function equipar(nombre) { await call('equipar_arma', { nombre_arma: nombre }); cerrarModales(); tg.showAlert("Equipado: " + nombre); }

@@ -13,56 +13,55 @@
         
         <div class="stat-card">
             <span>❤️ Vida</span>
-            <div class="bar-container"><div id="hp-bar" class="bar hp" style="width: 100%;"></div></div>
+            <div class="bar-container"><div id="hp-bar" class="bar hp"></div></div>
             <span id="hp-text">100/100</span>
         </div>
 
         <div class="stat-card">
             <span>⚡ Energía</span>
-            <div class="bar-container"><div id="en-bar" class="bar en" style="width: 0%;"></div></div>
+            <div class="bar-container"><div id="en-bar" class="bar en"></div></div>
             <span id="en-text">0/100</span>
         </div>
 
-        <div class="gold-card">💰 Oro: <span id="oro-val">0</span></div>
+        <div class="stat-card">
+            <span>⭐ Nivel <span id="lvl-val">1</span></span>
+            <div class="bar-container"><div id="xp-bar" class="bar xp"></div></div>
+            <span id="xp-text">0/100 XP</span>
+        </div>
+
+        <div class="gold-card">💰 Oro: <span id="oro-val">0</span> | ⚔️ <span id="arma-val">Puños</span></div>
 
         <button id="btn-explorar" class="btn primary">🌲 Explorar Bosque</button>
         <div class="btn-group">
             <button id="btn-tienda-toggle" class="btn shop">🏪 Tienda</button>
             <button id="btn-mochila-toggle" class="btn bag">🎒 Mochila</button>
+            <button id="btn-equipo-toggle" class="btn equipment">⚔️ Equipo</button>
         </div>
     </div>
-    
-    <div class="stat-card">
-        <span>⭐ Nivel <span id="lvl-val">1</span></span>
-        <div class="bar-container"><div id="xp-bar" class="bar xp"></div></div>
-        <span id="xp-text">0/100 XP</span>
-    </div>
-    <div class="gold-card">⚔️ Arma: <span id="arma-val">Manos</span></div>
-    
+
     <div id="modal-tienda" class="modal">
-    <div class="modal-content">
-        <h3>🏪 Tienda del Reino</h3>
-        <div class="item" data-info="⚡ +40 Energía">🍎 Comida (20💰) 
-            <button onclick="comprar('comida')">Comprar</button>
+        <div class="modal-content">
+            <h3>🏪 Tienda del Reino</h3>
+            <div class="item" data-info="⚡ +40 Energía">🍎 Comida (20💰) <button onclick="comprar('comida')">Comprar</button></div>
+            <div class="item" data-info="❤️ +50 Vida">🧪 Poción (50💰) <button onclick="comprar('pocion')">Comprar</button></div>
+            <div class="item" data-info="⚔️ +10 Ataque">🗡️ Espada Madera (100💰) <button onclick="comprar('espada_madera')">Comprar</button></div>
+            <div class="item" data-info="⚔️ +25 Ataque">🔱 Lanza Hierro (250💰) <button onclick="comprar('lanza_hierro')">Comprar</button></div>
+            <button class="btn close-btn" onclick="cerrarModales()">Cerrar</button>
         </div>
-        <div class="item" data-info="❤️ +50 Vida">🧪 Poción (50💰) 
-            <button onclick="comprar('pocion')">Comprar</button>
-        </div>
-        <div class="item" data-info="⚔️ +10 Ataque">🗡️ Espada Madera (100💰) 
-            <button onclick="comprar('espada_madera')">Comprar</button>
-        </div>
-        <div class="item" data-info="⚔️ +25 Ataque">🔱 Lanza Hierro (250💰) 
-            <button onclick="comprar('lanza_hierro')">Comprar</button>
-        </div>
-        <button class="btn close-btn" onclick="cerrarModales()">Cerrar</button>
     </div>
-</div>
 
     <div id="modal-mochila" class="modal">
         <div class="modal-content">
-            <h3>🎒 Tu Mochila</h3>
-            <div id="lista-inv">
-                </div>
+            <h3>🎒 Tu Mochila (Consumibles)</h3>
+            <div id="lista-inv"></div>
+            <button class="btn close-btn" onclick="cerrarModales()">Cerrar</button>
+        </div>
+    </div>
+
+    <div id="modal-equipo" class="modal">
+        <div class="modal-content">
+            <h3>⚔️ Tu Equipo (Armas)</h3>
+            <div id="lista-equipo"></div>
             <button class="btn close-btn" onclick="cerrarModales()">Cerrar</button>
         </div>
     </div>

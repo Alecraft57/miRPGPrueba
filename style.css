@@ -141,7 +141,8 @@ body {
     cursor: pointer;
 }
 
-.xp { background: #26f231; } /* Color naranja/dorado para la experiencia */
+.xp { background: #67f946; } /* Naranja para XP */
+.equipment { background: #54a0ff; } /* Azul claro para Equipo */
 
 .close-btn { 
     background: #555; 

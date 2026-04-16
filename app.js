@@ -25,7 +25,7 @@ function updateUI(data) {
     document.getElementById('player-name').innerText = tg.initDataUnsafe.user?.first_name || "Alejandro";
 }
 
-// Inicialización
+// Inicialización de datos desde la URL
 updateUI({ 
     hp: params.get('hp'), en: params.get('en'), oro: params.get('oro'),
     lvl: params.get('lvl'), xp: params.get('xp'), arma_equipada: params.get('arma')
@@ -41,7 +41,10 @@ async function call(route, body = {}) {
         const d = await res.json();
         if (d.success) updateUI(d);
         return d;
-    } catch (e) { console.error("Error API:", e); }
+    } catch (e) { 
+        console.error("Error API:", e);
+        tg.showAlert("No se pudo conectar con el servidor.");
+    }
 }
 
 // --- EXPLORACIÓN Y COMBATE ---
@@ -52,8 +55,8 @@ document.getElementById('btn-explorar').onclick = async () => {
     if (d.tipo === "combate") {
         enemigoActual = { ...d.enemigo, hpMax: d.enemigo.hp };
         danoAcumulado = 0;
-        document.getElementById('enemigo-nombre').innerText = enemigoActual.nombre;
-        document.getElementById('enemigo-hp-bar').style.width = "100%";
+        document.getElementById('mstruo-nombre').innerText = enemigoActual.nombre;
+        document.getElementById('mstruo-hp-bar').style.width = "100%";
         document.getElementById('combate-log').innerText = "¡Un enemigo bloquea tu camino!";
         document.getElementById('modal-combate').style.display = 'block';
     } else {
@@ -68,7 +71,7 @@ document.getElementById('btn-atacar').onclick = async () => {
     if (arma.includes("Lanza")) miDano = 25;
 
     enemigoActual.hp -= miDano;
-    document.getElementById('enemigo-hp-bar').style.width = Math.max(0, (enemigoActual.hp/enemigoActual.hpMax)*100) + "%";
+    document.getElementById('mstruo-hp-bar').style.width = Math.max(0, (enemigoActual.hp/enemigoActual.hpMax)*100) + "%";
     
     if (enemigoActual.hp <= 0) {
         document.getElementById('combate-log').innerText = "¡Victoria!";
@@ -81,21 +84,42 @@ document.getElementById('btn-atacar').onclick = async () => {
     }
 };
 
-// --- MODALES ---
-function cerrarModales() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+// --- GESTIÓN DE MODALES ---
+function cerrarModales() { 
+    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); 
+}
 
-document.getElementById('btn-tienda-toggle').onclick = () => { cerrarModales(); document.getElementById('modal-tienda').style.display = 'block'; };
-document.getElementById('btn-mochila-toggle').onclick = () => { cerrarModales(); document.getElementById('modal-mochila').style.display = 'block'; cargarInventario('mochila'); };
-document.getElementById('btn-equipo-toggle').onclick = () => { cerrarModales(); document.getElementById('modal-equipo').style.display = 'block'; cargarInventario('equipo'); };
-document.getElementById('btn-huir').onclick = () => { cerrarModales(); tg.showAlert("Escapaste con éxito."); };
+document.getElementById('btn-tienda-toggle').onclick = () => { 
+    cerrarModales(); 
+    document.getElementById('modal-tienda').style.display = 'block'; 
+};
 
+document.getElementById('btn-mochila-toggle').onclick = () => { 
+    cerrarModales(); 
+    document.getElementById('modal-mochila').style.display = 'block'; 
+    cargarInventario('mochila'); 
+};
+
+document.getElementById('btn-equipo-toggle').onclick = () => { 
+    cerrarModales(); 
+    document.getElementById('modal-equipo').style.display = 'block'; 
+    cargarInventario('equipo'); 
+};
+
+document.getElementById('btn-huir').onclick = () => { 
+    cerrarModales(); 
+    tg.showAlert("Escapaste con éxito."); 
+};
+
+// --- INVENTARIO ---
 async function cargarInventario(tipo) {
     const d = await call('get_inventario');
     const listaId = (tipo === 'mochila') ? 'lista-inv' : 'lista-equipo';
     const lista = document.getElementById(listaId);
+    if(!lista) return;
     lista.innerHTML = "";
     
-    if (!d.items || d.items.length === 0) {
+    if (!d || !d.items || d.items.length === 0) {
         lista.innerHTML = "<p style='color:gray;'>Vacío</p>";
         return;
     }
@@ -114,6 +138,17 @@ async function cargarInventario(tipo) {
     });
 }
 
-async function comprar(item_id) { const d = await call('comprar', { item_id }); tg.showAlert(d.msg); }
-async function usar(nombre) { await call('usar', { nombre_item: nombre }); cerrarModales(); }
-async function equipar(nombre) { await call('equipar_arma', { nombre_arma: nombre }); cerrarModales(); }
+async function comprar(item_id) { 
+    const d = await call('comprar', { item_id }); 
+    if(d) tg.showAlert(d.msg); 
+}
+
+async function usar(nombre) { 
+    const d = await call('usar', { nombre_item: nombre }); 
+    if(d && d.success) cerrarModales(); 
+}
+
+async function equipar(nombre) { 
+    const d = await call('equipar_arma', { nombre_arma: nombre }); 
+    if(d && d.success) cerrarModales(); 
+}

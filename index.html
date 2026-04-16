@@ -39,16 +39,24 @@
     </div>
     <div class="gold-card">⚔️ Arma: <span id="arma-val">Manos</span></div>
     
-
     <div id="modal-tienda" class="modal">
-        <div class="modal-content">
-            <h3>🏪 Tienda del Reino</h3>
-            <div class="item" data-info="⚡+40 Energía">🍎 Comida (20💰) <button onclick="comprar('comida')">Comprar</button></div>
-            <div class="item" data-info="❤️ +50 Vida">🧪 Poción (50💰) <button onclick="comprar('pocion')">Comprar</button></div>
-            <div class="item" data-info="🔥 Full Vida y Energía">💎 Elixir (100💰) <button onclick="comprar('elixir')">Comprar</button></div>
-            <button class="btn close-btn" onclick="cerrarModales()">Cerrar</button>
+    <div class="modal-content">
+        <h3>🏪 Tienda del Reino</h3>
+        <div class="item" data-info="⚡ +40 Energía">🍎 Comida (20💰) 
+            <button onclick="comprar('comida')">Comprar</button>
         </div>
+        <div class="item" data-info="❤️ +50 Vida">🧪 Poción (50💰) 
+            <button onclick="comprar('pocion')">Comprar</button>
+        </div>
+        <div class="item" data-info="⚔️ +10 Ataque">🗡️ Espada Madera (100💰) 
+            <button onclick="comprar('espada_madera')">Comprar</button>
+        </div>
+        <div class="item" data-info="⚔️ +25 Ataque">🔱 Lanza Hierro (250💰) 
+            <button onclick="comprar('lanza_hierro')">Comprar</button>
+        </div>
+        <button class="btn close-btn" onclick="cerrarModales()">Cerrar</button>
     </div>
+</div>
 
     <div id="modal-mochila" class="modal">
         <div class="modal-content">

@@ -39,14 +39,14 @@
         </div>
     </div>
 
-    <div id="modal-combate" class="modal" style="display:none; background:rgba(0,0,0,0.9);">
-        <div class="modal-content" style="border: 2px solid #ff4757;">
-            <h2 id="mstruo-nombre" style="color:#ff4757;">Combate</h2>
+    <div id="modal-combate" class="modal">
+        <div class="modal-content combate-content">
+            <h2 id="mstruo-nombre">Combate</h2>
             <div class="bar-container"><div id="mstruo-hp-bar" class="bar hp"></div></div>
-            <div id="combate-log" style="color:#ccc; margin:15px 0;"></div>
+            <div id="combate-log">¡Un enemigo aparece!</div>
             <div class="btn-group">
                 <button id="btn-atacar" class="btn primary">⚔️ Atacar</button>
-                <button onclick="cerrarModales()" class="btn bag">🏃 Huir</button>
+                <button id="btn-huir" class="btn bag">🏃 Huir</button>
             </div>
         </div>
     </div>

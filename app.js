@@ -3,13 +3,9 @@ const params = new URLSearchParams(window.location.search);
 const SERVER_URL = "https://automaker-amuck-gleeful.ngrok-free.dev"; 
 
 let enemigoActual = null;
-let danoRecibidoSesion = 0;
+let danoAcumulado = 0;
 
 function updateUI(data) {
-    // Quitar el "Cargando..." poniendo el nombre del usuario
-    const nombre = tg.initDataUnsafe.user?.first_name || "Viajero";
-    document.getElementById('player-name').innerText = nombre;
-
     if(data.hp !== undefined) {
         document.getElementById('hp-bar').style.width = data.hp + "%";
         document.getElementById('hp-text').innerText = data.hp + "/100";
@@ -25,9 +21,11 @@ function updateUI(data) {
         document.getElementById('xp-text').innerText = data.xp + "/100 XP";
     }
     if(data.arma_equipada !== undefined) document.getElementById('arma-val').innerText = data.arma_equipada;
+    
+    document.getElementById('player-name').innerText = tg.initDataUnsafe.user?.first_name || "Alejandro";
 }
 
-// Carga inicial
+// Inicialización
 updateUI({ 
     hp: params.get('hp'), en: params.get('en'), oro: params.get('oro'),
     lvl: params.get('lvl'), xp: params.get('xp'), arma_equipada: params.get('arma')
@@ -43,20 +41,20 @@ async function call(route, body = {}) {
         const d = await res.json();
         if (d.success) updateUI(d);
         return d;
-    } catch (e) { console.error("Error en API:", e); }
+    } catch (e) { console.error("Error API:", e); }
 }
 
-// --- BOTONES ---
+// --- EXPLORACIÓN Y COMBATE ---
 document.getElementById('btn-explorar').onclick = async () => {
     const d = await call('explorar');
     if (!d || !d.success) return tg.showAlert(d?.msg || "Error");
     
     if (d.tipo === "combate") {
         enemigoActual = { ...d.enemigo, hpMax: d.enemigo.hp };
-        danoRecibidoSesion = 0;
+        danoAcumulado = 0;
         document.getElementById('enemigo-nombre').innerText = enemigoActual.nombre;
         document.getElementById('enemigo-hp-bar').style.width = "100%";
-        document.getElementById('combate-log').innerText = "¡Un enemigo aparece!";
+        document.getElementById('combate-log').innerText = "¡Un enemigo bloquea tu camino!";
         document.getElementById('modal-combate').style.display = 'block';
     } else {
         tg.showAlert(d.msg);
@@ -65,36 +63,57 @@ document.getElementById('btn-explorar').onclick = async () => {
 
 document.getElementById('btn-atacar').onclick = async () => {
     const arma = document.getElementById('arma-val').innerText;
-    const miDano = arma.includes("Lanza") ? 25 : arma.includes("Espada") ? 15 : 7;
-    
+    let miDano = 7;
+    if (arma.includes("Espada")) miDano = 15;
+    if (arma.includes("Lanza")) miDano = 25;
+
     enemigoActual.hp -= miDano;
     document.getElementById('enemigo-hp-bar').style.width = Math.max(0, (enemigoActual.hp/enemigoActual.hpMax)*100) + "%";
     
     if (enemigoActual.hp <= 0) {
-        await call('finalizar_combate', { ganado: true, recompensa: {xp: enemigoActual.xp, oro: enemigoActual.oro}, dano_recibido: danoRecibidoSesion });
-        cerrarModales();
-        tg.showAlert("¡Has derrotado al enemigo!");
+        document.getElementById('combate-log').innerText = "¡Victoria!";
+        await call('finalizar_combate', { ganado: true, recompensa: {xp: enemigoActual.xp, oro: enemigoActual.oro}, dano_recibido: danoAcumulado });
+        setTimeout(() => cerrarModales(), 1000);
     } else {
-        const golpe = Math.floor(Math.random() * enemigoActual.atq) + 1;
-        danoRecibidoSesion += golpe;
-        document.getElementById('combate-log').innerText = `¡El enemigo te quita ${golpe} HP!`;
+        const danoRival = Math.floor(Math.random() * enemigoActual.atq) + 1;
+        danoAcumulado += danoRival;
+        document.getElementById('combate-log').innerText = `Golpeas por ${miDano}. ¡Te quitan ${danoRival} HP!`;
     }
 };
 
+// --- MODALES ---
 function cerrarModales() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
-document.getElementById('btn-huir').onclick = () => cerrarModales();
-document.getElementById('btn-tienda-toggle').onclick = () => document.getElementById('modal-tienda').style.display = 'block';
-document.getElementById('btn-mochila-toggle').onclick = () => { document.getElementById('modal-mochila').style.display = 'block'; cargarInventario('mochila'); };
+
+document.getElementById('btn-tienda-toggle').onclick = () => { cerrarModales(); document.getElementById('modal-tienda').style.display = 'block'; };
+document.getElementById('btn-mochila-toggle').onclick = () => { cerrarModales(); document.getElementById('modal-mochila').style.display = 'block'; cargarInventario('mochila'); };
+document.getElementById('btn-equipo-toggle').onclick = () => { cerrarModales(); document.getElementById('modal-equipo').style.display = 'block'; cargarInventario('equipo'); };
+document.getElementById('btn-huir').onclick = () => { cerrarModales(); tg.showAlert("Escapaste con éxito."); };
 
 async function cargarInventario(tipo) {
     const d = await call('get_inventario');
-    const lista = document.getElementById('lista-inv');
+    const listaId = (tipo === 'mochila') ? 'lista-inv' : 'lista-equipo';
+    const lista = document.getElementById(listaId);
     lista.innerHTML = "";
+    
+    if (!d.items || d.items.length === 0) {
+        lista.innerHTML = "<p style='color:gray;'>Vacío</p>";
+        return;
+    }
+
     d.items.forEach(i => {
-        lista.innerHTML += `<div class="item"><span>${i.nombre} (x${i.cantidad})</span> 
-            <button onclick="usar('${i.nombre}')">Usar</button></div>`;
+        const esArma = i.nombre.includes("Espada") || i.nombre.includes("Lanza");
+        if ((tipo === 'mochila' && !esArma) || (tipo === 'equipo' && esArma)) {
+            lista.innerHTML += `
+                <div class="item">
+                    <span>${i.nombre} (x${i.cantidad})</span>
+                    <button onclick="${esArma ? 'equipar' : 'usar'}('${i.nombre}')">
+                        ${esArma ? 'Equipar' : 'Usar'}
+                    </button>
+                </div>`;
+        }
     });
 }
 
-async function comprar(item_id) { const res = await call('comprar', { item_id }); tg.showAlert(res.msg); }
-async function usar(nombre) { await call('usar', { nombre_item: nombre }); cerrarModales(); tg.showAlert("¡Objeto usado!"); }
+async function comprar(item_id) { const d = await call('comprar', { item_id }); tg.showAlert(d.msg); }
+async function usar(nombre) { await call('usar', { nombre_item: nombre }); cerrarModales(); }
+async function equipar(nombre) { await call('equipar_arma', { nombre_arma: nombre }); cerrarModales(); }

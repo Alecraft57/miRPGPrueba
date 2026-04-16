@@ -39,20 +39,35 @@
         </div>
     </div>
 
+    <div id="modal-combate" class="modal combate-bg">
+        <div class="modal-content combate-content">
+            <h2 id="enemigo-nombre">¡Enemigo!</h2>
+            <div class="stat-card">
+                <span>❤️ Vida Enemigo</span>
+                <div class="bar-container"><div id="enemigo-hp-bar" class="bar hp" style="width: 100%;"></div></div>
+            </div>
+            <div id="combate-log">¡Un monstruo aparece!</div>
+            <div class="btn-group">
+                <button id="btn-atacar" class="btn primary">⚔️ Atacar</button>
+                <button id="btn-huir" class="btn bag">🏃 Huir</button>
+            </div>
+        </div>
+    </div>
+
     <div id="modal-tienda" class="modal">
         <div class="modal-content">
             <h3>🏪 Tienda del Reino</h3>
-            <div class="item" data-info="⚡ +40 Energía">🍎 Comida (20💰) <button onclick="comprar('comida')">Comprar</button></div>
-            <div class="item" data-info="❤️ +50 Vida">🧪 Poción (50💰) <button onclick="comprar('pocion')">Comprar</button></div>
-            <div class="item" data-info="⚔️ +10 Ataque">🗡️ Espada Madera (100💰) <button onclick="comprar('espada_madera')">Comprar</button></div>
-            <div class="item" data-info="⚔️ +25 Ataque">🔱 Lanza Hierro (250💰) <button onclick="comprar('lanza_hierro')">Comprar</button></div>
+            <div class="item">🍎 Comida (20💰) <button onclick="comprar('comida')">Comprar</button></div>
+            <div class="item">🧪 Poción (50💰) <button onclick="comprar('pocion')">Comprar</button></div>
+            <div class="item">🗡️ Espada (100💰) <button onclick="comprar('espada_madera')">Comprar</button></div>
+            <div class="item">🔱 Lanza (250💰) <button onclick="comprar('lanza_hierro')">Comprar</button></div>
             <button class="btn close-btn" onclick="cerrarModales()">Cerrar</button>
         </div>
     </div>
 
     <div id="modal-mochila" class="modal">
         <div class="modal-content">
-            <h3>🎒 Tu Mochila (Consumibles)</h3>
+            <h3>🎒 Mochila</h3>
             <div id="lista-inv"></div>
             <button class="btn close-btn" onclick="cerrarModales()">Cerrar</button>
         </div>
@@ -60,7 +75,7 @@
 
     <div id="modal-equipo" class="modal">
         <div class="modal-content">
-            <h3>⚔️ Tu Equipo (Armas)</h3>
+            <h3>⚔️ Equipo</h3>
             <div id="lista-equipo"></div>
             <button class="btn close-btn" onclick="cerrarModales()">Cerrar</button>
         </div>

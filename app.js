@@ -64,7 +64,15 @@ document.getElementById('btn-explorar').onclick = () => call('explorar');
 
 async function comprar(item_id) {
     const res = await call('comprar', { item_id });
-    if (res?.success) alert(res.msg);
+    if (res?.success) {
+        // Sonido de monedas o aviso
+        console.log("¡Compra exitosa!");
+    } else {
+        // Efecto visual: el oro parpadea en rojo si no tienes suficiente
+        const oroContainer = document.querySelector('.gold-card');
+        oroContainer.classList.add('insufficient-gold');
+        setTimeout(() => oroContainer.classList.remove('insufficient-gold'), 500);
+    }
 }
 
 async function cargarInventario() {

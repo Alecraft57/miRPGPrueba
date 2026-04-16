@@ -141,6 +141,8 @@ body {
     cursor: pointer;
 }
 
+.xp { background: #26f231; } /* Color naranja/dorado para la experiencia */
+
 .close-btn { 
     background: #555; 
     margin-top: 10px; 

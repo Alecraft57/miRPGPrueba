@@ -10,28 +10,11 @@
 <body>
     <div id="game-container">
         <h2 id="player-name">Cargando...</h2>
-        
-        <div class="stat-card">
-            <span>❤️ Vida</span>
-            <div class="bar-container"><div id="hp-bar" class="bar hp"></div></div>
-            <span id="hp-text">100/100</span>
-        </div>
-
-        <div class="stat-card">
-            <span>⚡ Energía</span>
-            <div class="bar-container"><div id="en-bar" class="bar en"></div></div>
-            <span id="en-text">0/100</span>
-        </div>
-
-        <div class="stat-card">
-            <span>⭐ Nivel <span id="lvl-val">1</span></span>
-            <div class="bar-container"><div id="xp-bar" class="bar xp"></div></div>
-            <span id="xp-text">0/100 XP</span>
-        </div>
-
+        <div class="stat-card">❤️ Vida <div class="bar-container"><div id="hp-bar" class="bar hp"></div></div><span id="hp-text">100/100</span></div>
+        <div class="stat-card">⚡ Energía <div class="bar-container"><div id="en-bar" class="bar en"></div></div><span id="en-text">0/100</span></div>
+        <div class="stat-card">⭐ Lvl <span id="lvl-val">1</span> <div class="bar-container"><div id="xp-bar" class="bar xp"></div></div><span id="xp-text">0/100 XP</span></div>
         <div class="gold-card">💰 Oro: <span id="oro-val">0</span> | ⚔️ <span id="arma-val">Puños</span></div>
-
-        <button id="btn-explorar" class="btn primary">🌲 Explorar Bosque</button>
+        <button id="btn-explorar" class="btn primary">🧭 Explorar (10⚡)</button>
         <div class="btn-group">
             <button id="btn-tienda-toggle" class="btn shop">🏪 Tienda</button>
             <button id="btn-mochila-toggle" class="btn bag">🎒 Mochila</button>
@@ -40,42 +23,32 @@
     </div>
 
     <div id="modal-combate" class="modal">
-        <div class="modal-content combate-content">
-            <h2 id="mstruo-nombre">Combate</h2>
+        <div class="modal-content">
+            <h2 id="mstruo-nombre">Monstruo</h2>
             <div class="bar-container"><div id="mstruo-hp-bar" class="bar hp"></div></div>
-            <div id="combate-log">¡Un enemigo aparece!</div>
-            <div class="btn-group">
-                <button id="btn-atacar" class="btn primary">⚔️ Atacar</button>
-                <button id="btn-huir" class="btn bag">🏃 Huir</button>
-            </div>
+            <div id="combate-log"></div>
+            <button id="btn-atacar" class="btn primary">⚔️ Atacar</button>
+            <button onclick="cerrarModales()" class="btn bag">🏃 Huir</button>
         </div>
     </div>
 
     <div id="modal-tienda" class="modal">
         <div class="modal-content">
-            <h3>🏪 Tienda del Reino</h3>
-            <div class="item">🍎 Comida (20💰) <button onclick="comprar('comida')">Comprar</button></div>
-            <div class="item">🧪 Poción (50💰) <button onclick="comprar('pocion')">Comprar</button></div>
-            <div class="item">🗡️ Espada (100💰) <button onclick="comprar('espada_madera')">Comprar</button></div>
-            <div class="item">🔱 Lanza (250💰) <button onclick="comprar('lanza_hierro')">Comprar</button></div>
+            <h3>🏪 Tienda</h3>
+            <div class="item" data-info="⚡ +40 Energía">🍎 Comida (20💰) <button onclick="comprar('comida')">Comprar</button></div>
+            <div class="item" data-info="❤️ +50 Vida">🧪 Poción (50💰) <button onclick="comprar('pocion')">Comprar</button></div>
+            <div class="item" data-info="⚔️ Daño: 12-18">🗡️ Espada (100💰) <button onclick="comprar('espada_madera')">Comprar</button></div>
+            <div class="item" data-info="⚔️ Daño: 20-30">🔱 Lanza (250💰) <button onclick="comprar('lanza_hierro')">Comprar</button></div>
             <button class="btn close-btn" onclick="cerrarModales()">Cerrar</button>
         </div>
     </div>
 
     <div id="modal-mochila" class="modal">
-        <div class="modal-content">
-            <h3>🎒 Mochila</h3>
-            <div id="lista-inv"></div>
-            <button class="btn close-btn" onclick="cerrarModales()">Cerrar</button>
-        </div>
+        <div class="modal-content"><h3>🎒 Mochila</h3><div id="lista-inv"></div><button onclick="cerrarModales()">Cerrar</button></div>
     </div>
 
     <div id="modal-equipo" class="modal">
-        <div class="modal-content">
-            <h3>⚔️ Equipo</h3>
-            <div id="lista-equipo"></div>
-            <button class="btn close-btn" onclick="cerrarModales()">Cerrar</button>
-        </div>
+        <div class="modal-content"><h3>⚔️ Equipo</h3><div id="lista-equipo"></div><button onclick="cerrarModales()">Cerrar</button></div>
     </div>
 
     <script src="app.js"></script>
